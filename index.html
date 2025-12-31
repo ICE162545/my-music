@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year - Special Proposal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;500;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-blue: #020b1a;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #0a192f 0%, #020b1a 100%);
+            font-family: 'Sarabun', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ดาวระยิบระยับบนท้องฟ้า */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* กล่องข้อความสไตล์เรียบหรู */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(212, 175, 55, 0.05);
+            z-index: 100;
+            max-width: 500px;
+            width: 85%;
+            transition: opacity 0.8s ease;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 2.2rem;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        p {
+            color: #e0e0e0;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 35px;
+            font-weight: 300;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            align-items: center;
+            min-height: 50px;
+        }
+
+        .btn {
+            padding: 12px 40px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-yes {
+            background: var(--gold);
+            color: var(--dark-blue);
+            border: 1px solid var(--gold);
+            font-weight: 700;
+        }
+
+        .btn-yes:hover {
+            background: transparent;
+            color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-no {
+            background: transparent;
+            color: #888;
+            border: 1px solid #444;
+        }
+
+        #success-message {
+            display: none;
+        }
+
+        .gold-text {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        canvas#fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stars" id="starField"></div>
+    <canvas id="fireworks"></canvas>
+
+    <div class="glass-card" id="mainCard">
+        <div id="ask-section">
+            <h1>HAPPY NEW YEAR</h1>
+            <p>เริ่มต้นปีใหม่ครั้งนี้... <br><span class="gold-text" style="font-size: 1.5rem;">เป็นแฟนกับพี่มั้ยครับ?</span></p>
+            <div class="btn-container">
+                <button class="btn btn-yes" onclick="celebrate()">ตกลง</button>
+                <button class="btn btn-no" id="noBtn" onmouseover="moveNo()">ไม่ดีกว่า</button>
+            </div>
+        </div>
+
+        <div id="success-message">
+            <h1>WELCOME TO 2026</h1>
+            <p>ขอบคุณที่เข้ามาเป็น <span class="gold-text">ของขวัญปีใหม่</span> ของพี่นะ<br>พี่จะดูแลเราให้ดีที่สุดครับ ❤️</p>
+        </div>
+    </div>
+
+    <script>
+        // สร้างดวงดาวระยิบระยับ
+        const starField = document.getElementById('starField');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.style.position = 'absolute';
+            star.style.width = Math.random() * 2 + 'px';
+            star.style.height = star.style.width;
+            star.style.background = 'white';
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = Math.random() * 100 + 'vh';
+            star.style.opacity = Math.random();
+            star.style.borderRadius = '50%';
+            star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite`;
+            starField.appendChild(star);
+        }
+
+        // ปุ่มหนี
+        function moveNo() {
+            const btn = document.getElementById('noBtn');
+            const x = Math.random() * (window.innerWidth - 150);
+            const y = Math.random() * (window.innerHeight - 50);
+            btn.style.position = 'fixed';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+
+        // ระบบพลุแบบสมจริง
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, color, velocityX, velocityY) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = { x: velocityX, y: velocityY };
+                this.alpha = 1;
+                this.friction = 0.96;
+                this.gravity = 0.15;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.012;
+            }
+        }
+
+        function createFirework(x, y) {
+            const colors = ['#d4af37', '#ffffff', '#ffcf40', '#ff4d6d', '#00f2ff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const particleCount = 100;
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (Math.PI * 2 / particleCount) * i;
+                const strength = Math.random() * 10 + 2;
+                particles.push(new Particle(
+                    x, y, color, 
+                    Math.cos(angle) * strength, 
+                    Math.sin(angle) * strength
+                ));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(2, 11, 26, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                if (p.alpha > 0) {
+                    p.update();
+                    p.draw();
+                } else {
+                    particles.splice(i, 1);
+                }
+            });
+        }
+
+        function celebrate() {
+            document.getElementById('ask-section').style.display = 'none';
+            document.getElementById('success-message').style.display = 'block';
+            animate();
+            setInterval(() => {
+                createFirework(Math.random() * canvas.width, Math.random() * canvas.height * 0.6);
+            }, 600);
+        }
+    </script>
+
+    <style>
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+    </style>
+</body>
+</html>
