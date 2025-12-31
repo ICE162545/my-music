@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #ff477e;
+            --secondary-color: #ff85a1;
+            --bg-gradient: linear-gradient(135deg, #fce4ec 0%, #ffe1e1 100%);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: var(--bg-gradient);
+            font-family: 'Kanit', sans-serif;
+            overflow: hidden;
+        }
+
+        /* พื้นหลังหัวใจลอย */
+        .heart-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* กล่องข้อความสไตล์ Glassmorphism */
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 3rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            z-index: 10;
+            max-width: 450px;
+            width: 90%;
+            transition: all 0.5s ease;
+        }
+
+        .img-container {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        h1 {
+            color: #d81b60;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        p {
+            color: #6d4c41;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            min-height: 60px;
+        }
+
+        /* สไตล์ปุ่มแบบจ้างออกแบบ */
+        .btn {
+            padding: 12px 35px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #yesBtn {
+            background: linear-gradient(45deg, #ff477e, #ff85a1);
+            color: white;
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 71, 126, 0.4);
+        }
+
+        #noBtn {
+            background: #ffffff;
+            color: #999;
+            position: relative;
+        }
+
+        /* หน้าจอสำเร็จ */
+        #success-content {
+            display: none;
+        }
+
+        .message-special {
+            font-family: 'Caveat', cursive;
+            font-size: 3.5rem;
+            color: #ff477e;
+            margin-top: 15px;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        canvas#fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="heart-bg" id="heartContainer"></div>
+    <canvas id="fireworks"></canvas>
+
+    <div class="card" id="mainCard">
+        <div id="ask-content">
+            <div class="img-container">💖</div>
+            <h1>Hey, You!</h1>
+            <p>ที่ผ่านมาขอบคุณมากๆ เลยนะ... <br> <b>เป็นแฟนกับเราได้ไหม?</b></p>
+            <div class="btn-group">
+                <button class="btn" id="yesBtn" onclick="showCelebration()">ตกลง</button>
+                <button class="btn" id="noBtn" onmouseover="moveButton()">ไม่ดีกว่า</button>
+            </div>
+        </div>
+
+        <div id="success-content">
+            <div class="img-container">🥰</div>
+            <h1>You Made My Day!</h1>
+            <div class="message-special">I Love You</div>
+            <p>สัญญาวว่าจะดูแลให้ดีที่สุดเลย!</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. สร้างหัวใจลอยหลังพื้นหลัง
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.style.position = 'absolute';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '100vh';
+            heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            heart.style.opacity = Math.random();
+            heart.style.zIndex = '1';
+            heart.style.transition = `transform ${Math.random() * 3 + 2}s linear, opacity 2s`;
+            
+            document.getElementById('heartContainer').appendChild(heart);
+
+            setTimeout(() => {
+                heart.style.transform = `translateY(-110vh) rotate(${Math.random() * 360}deg)`;
+            }, 100);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+        }
+        setInterval(createFloatingHeart, 400);
+
+        // 2. ฟังก์ชันปุ่มหนี (แบบสมูทกว่าเดิม)
+        function moveButton() {
+            const noBtn = document.getElementById('noBtn');
+            const padding = 50;
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - padding);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - padding);
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+            noBtn.style.zIndex = '999';
+        }
+
+        // 3. ฟังก์ชันเฉลิมฉลอง
+        function showCelebration() {
+            // ซ่อนหน้าแรก แสดงหน้าสำเร็จ
+            document.getElementById('ask-content').style.display = 'none';
+            document.getElementById('success-content').style.display = 'block';
+            document.getElementById('mainCard').style.transform = 'scale(1.05)';
+
+            // ยิงพลุกระดาษ (Confetti)
+            var duration = 15 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                // ยิงจากสองข้าง
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+
+            // ยิงพลุลูกใหญ่
+            fireworks();
+        }
+
+        // 4. ระบบพลุ (แบบสวยงาม)
+        function fireworks() {
+            const canvas = document.getElementById('fireworks');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            function fire() {
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#ff477e', '#ff85a1', '#fbb1bd', '#f9bec7']
+                });
+            }
+            fire();
+            setTimeout(fire, 1000);
+            setTimeout(fire, 2000);
+        }
+    </script>
+</body>
+</html>
